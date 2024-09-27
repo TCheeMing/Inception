@@ -1,0 +1,18 @@
+name: Inception
+
+services:
+  nginx:
+    build:
+      context: requirements/nginx
+      dockerfile: Dockerfile.nginx
+    secrets:
+      - server-certificate
+      - server-key
+    ports:
+      - 127.0.0.1:443:443
+
+secrets:
+  server-certificate:
+    file: ../secrets/server.rsa.crt
+  server-key:
+    file: ../secrets/server.rsa.key
