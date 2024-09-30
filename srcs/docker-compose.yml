@@ -18,12 +18,15 @@ services:
       - wordpress-php
     environment:
       - DOMAIN_NAME=${DOMAIN_NAME}
+    volumes:
+      - ~/data/wordpress:/var/www/html:ro
+      
   wordpress-php:
     build:
       context: requirements/wordpress
       dockerfile: Dockerfile.wordpress-php
     volumes:
-      - ~/data/wordpress-db:/var/www/html:rw
+      - ~/data/wordpress:/var/www/html:ro
 
 secrets:
   server.rsa.crt:
