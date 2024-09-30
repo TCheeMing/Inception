@@ -5,14 +5,28 @@ services:
     build:
       context: requirements/nginx
       dockerfile: Dockerfile.nginx
-    secrets:
-      - server-certificate
-      - server-key
+    extra_hosts:
+      - cteoh.42.fr=127.0.0.1
+      - www.cteoh.42.fr=127.0.0.1
     ports:
       - 127.0.0.1:443:443
+      - 127.0.0.1:80:80
+    secrets:
+      - server.rsa.crt
+      - server.rsa.key
+    depends_on:
+      - wordpress-php
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+  wordpress-php:
+    build:
+      context: requirements/wordpress
+      dockerfile: Dockerfile.wordpress-php
+    volumes:
+      - ~/data/wordpress-db:/var/www/html:rw
 
 secrets:
-  server-certificate:
+  server.rsa.crt:
     file: ../secrets/server.rsa.crt
-  server-key:
+  server.rsa.key:
     file: ../secrets/server.rsa.key

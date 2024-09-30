@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/09/27 23:55:18 by cteoh            ###   ########.fr        #
+#    Updated: 2024/09/29 18:41:21 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,16 +42,27 @@ RESET	= \e[0m
 all: $(NAME)
 
 $(NAME): $(SECRETS) $(SRC)
-	@printf "$(GREEN)Generating containers...$(RESET)\n"
-	@cd $(SRCDIR) && docker compose up -d > /dev/null 2>&1
+	@printf "$(GREEN)Generating and starting containers...$(RESET)\n"
+	@cd $(SRCDIR) && docker compose up --build -d
+	@echo "#!/bin/sh" > $(NAME)
+	@echo >> $(NAME)
+	@echo "cd $(SRCDIR) && docker compose logs -f" >> $(NAME)
+	@chmod 755 $(NAME)
+	@sleep 2 && docker ps -a
 
 $(SECRETS) &:
 	@printf "$(GREEN)Generating SSL certificates...$(RESET)\n"
-	@./$(SRCDIR)/requirements/nginx/$(SSL_GEN) > /dev/null 2>&1
+	@mkdir -p secrets/
+	@./$(SRCDIR)/requirements/nginx/$(SSL_GEN)
+
+up:
+	@printf "$(GREEN)Starting containers...$(RESET)\n"
+	@cd $(SRCDIR) && docker compose up -d
+	@sleep 2 && docker ps -a
 
 clean:
-	@printf "$(YELLOW)Removing all containers...$(RESET)\n"
-	@cd $(SRCDIR) && docker compose down > /dev/null 2>&1
+	@printf "$(YELLOW)Stopping and removing all containers...$(RESET)\n"
+	@cd $(SRCDIR) && docker compose down
 
 fclean: clean
 	@printf "$(YELLOW)Removing all secrets...$(RESET)\n"
@@ -59,8 +70,9 @@ fclean: clean
 	@printf "$(YELLOW)Removing all images...$(RESET)\n"
 	@$(shell docker rmi -f $$(docker images -q) > /dev/null 2>&1)
 	@printf "$(YELLOW)Removing all anonymous volumes, unused networks, and unused build cache...$(RESET)\n"
-	@docker system prune --volumes -f > /dev/null 2>&1
+	@docker system prune --volumes -f
+	@$(RM) $(NAME)
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re up

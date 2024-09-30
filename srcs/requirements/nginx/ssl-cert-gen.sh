@@ -17,4 +17,4 @@ openssl req \
 		-nodes \
 		-out ./secrets/server.rsa.crt \
 		-keyout ./secrets/server.rsa.key \
-		-subj "/C=/ST=/L=/O=/OU=/CN=cteoh.42.fr"
+		-subj "/C=/ST=/L=/O=/OU=/CN="
