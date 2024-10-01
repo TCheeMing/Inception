@@ -20,6 +20,7 @@ services:
       - DOMAIN_NAME=${DOMAIN_NAME}
     volumes:
       - ~/data/wordpress:/var/www/html:ro
+      - realtime:/usr/share/php83/fpm:ro
       
   wordpress-php:
     build:
@@ -27,9 +28,13 @@ services:
       dockerfile: Dockerfile.wordpress-php
     volumes:
       - ~/data/wordpress:/var/www/html:ro
+      - realtime:/usr/share/php83/fpm:ro
 
 secrets:
   server.rsa.crt:
     file: ../secrets/server.rsa.crt
   server.rsa.key:
     file: ../secrets/server.rsa.key
+
+volumes:
+  realtime:
