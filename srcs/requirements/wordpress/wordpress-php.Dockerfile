@@ -2,8 +2,7 @@ FROM alpine:3.20.3
 
 WORKDIR /var/www/html/
 
-RUN apk update && \
-	apk add php83 php83-fpm php83-mysqli && \
+RUN apk add --no-cache php83 php83-fpm php83-mysqli wget && \
 	cp /etc/php83/php-fpm.conf /etc/php83/php-fpm.conf.default && \
 	cp /etc/php83/php-fpm.d/www.conf /etc/php83/php-fpm.d/www.conf.default && \
 	sed -i 's/;error_log = log\/php83\/error.log/error_log = \/dev\/stderr/g' /etc/php83/php-fpm.conf && \
@@ -19,10 +18,11 @@ RUN apk update && \
 	echo >> /etc/php83/php-fpm.d/www.conf && \
 	echo '; PHP (.ini) Config' >> /etc/php83/php-fpm.d/www.conf && \
 	echo 'php_admin_flag[display_errors] = On' >> /etc/php83/php-fpm.d/www.conf && \
-	echo 'php_admin_value[error_log] = /dev/stderr' >> /etc/php83/php-fpm.d/www.conf && \
-	rm -rf /var/cache/apk/*
+	echo 'php_admin_value[error_log] = /dev/stderr' >> /etc/php83/php-fpm.d/www.conf
+
+COPY ./tools/wordpress-run.sh /tmp/
 
 EXPOSE 9000
 EXPOSE 9001
 
-CMD ["php-fpm83", "--nodaemonize"]
+CMD [ "/tmp/wordpress-run.sh" ]
