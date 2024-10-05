@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/10/03 19:37:40 by cteoh            ###   ########.fr        #
+#    Updated: 2024/10/06 03:11:17 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -82,7 +82,7 @@ fclean: clean
 	@printf "$(YELLOW)Removing all secrets...$(RESET)\n"
 	@$(RM) secrets/*
 	@printf "$(YELLOW)Removing all named volumes...$(RESET)\n"
-	@$(shell docker rmi -f $$(docker volume ls -q) > /dev/null 2>&1)
+	@$(shell docker volume rm -f $$(docker volume ls -q) > /dev/null 2>&1)
 	@printf "$(YELLOW)Removing all images...$(RESET)\n"
 	@$(shell docker rmi -f $$(docker images -q) > /dev/null 2>&1)
 	@printf "$(YELLOW)Removing all anonymous volumes, unused networks, and unused build cache...$(RESET)\n"

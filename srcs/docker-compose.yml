@@ -3,10 +3,12 @@ name: Inception
 services:
   mariadb:
     build:
-      context: ./requirements/mariadb
+      context: ./requirements/mariadb/
       dockerfile: mariadb.Dockerfile
     env_file:
       - .env
+    networks:
+      - infra
     restart: on-failure
     secrets:
       - mariadb_root_password
@@ -16,15 +18,14 @@ services:
 
   nginx:
     build:
-      context: requirements/nginx
+      context: requirements/nginx/
       dockerfile: nginx.Dockerfile
     depends_on:
       - wordpress-php
     env_file:
       - .env
-    extra_hosts:
-      - cteoh.42.fr=127.0.0.1
-      - www.cteoh.42.fr=127.0.0.1
+    networks:
+      - infra
     ports:
       - 127.0.0.1:443:443
       - 127.0.0.1:80:80
@@ -34,21 +35,36 @@ services:
       - server.rsa.key
     volumes_from:
       - wordpress-php:ro
-      
+
+  redis:
+    build:
+      context: requirements/bonus/redis/
+      dockerfile: redis.Dockerfile
+    networks:
+      - infra
+    restart: on-failure
+
   wordpress-php:
     build:
-      context: requirements/wordpress
+      context: requirements/wordpress/
       dockerfile: wordpress-php.Dockerfile
     env_file:
       - .env
     depends_on:
       - mariadb
+      - redis
+    networks:
+      - infra
     restart: on-failure
     secrets:
       - mariadb_password
     volumes:
       - ~/data/wordpress:/var/www/html:rw
       - realtime:/usr/share/php83/fpm:ro
+
+networks:
+  infra:
+    driver: bridge
 
 secrets:
   server.rsa.crt:

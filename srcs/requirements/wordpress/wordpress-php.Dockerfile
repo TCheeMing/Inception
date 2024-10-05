@@ -20,9 +20,9 @@ RUN apk add --no-cache php83 php83-fpm php83-mysqli wget && \
 	echo 'php_admin_flag[display_errors] = On' >> /etc/php83/php-fpm.d/www.conf && \
 	echo 'php_admin_value[error_log] = /dev/stderr' >> /etc/php83/php-fpm.d/www.conf
 
-COPY ./tools/wordpress-run.sh /tmp/
+COPY ./tools/wordpress-run.sh ./wp-config.php ./tools/test.php /root/
 
 EXPOSE 9000
 EXPOSE 9001
 
-CMD [ "/tmp/wordpress-run.sh" ]
+CMD [ "/root/wordpress-run.sh" ]
