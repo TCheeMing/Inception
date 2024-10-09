@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/10/09 16:19:34 by cteoh            ###   ########.fr        #
+#    Updated: 2024/10/09 16:49:06 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,6 @@ NAME = Inception
 
 # Source and Object Files
 SRCDIR			= srcs
-SECRETSDIR		= secrets
 ENV				= .env
 FTP				= ftp.Dockerfile sshd_config ftp-run.sh
 MARIADB			= mariadb.Dockerfile mariadb-run.sh
@@ -24,6 +23,7 @@ REDIS			= redis.Dockerfile redis.conf
 WORDPRESS		= wordpress-php.Dockerfile wp-config.php wordpress-run.sh
 SRC				= docker-compose.yml .env $(FTP) $(MARIADB) $(NGINX) $(REDIS) \
 				  $(WORDPRESS)
+SECRETSDIR		= secrets
 SSL_CERTS		= server.rsa.crt server.rsa.key
 MARIADB_PASS	= mariadb_root_password mariadb_password
 FTP_PASS		= ftp_password
@@ -33,9 +33,7 @@ vpath % $(shell find $(SRCDIR) -type d -print | tr "\n" ":"					  \
 vpath % secrets/
 
 # Dependencies (Tools)
-MARIADB_GEN	= $(SRCDIR)/requirements/mariadb/tools/mariadb-password-gen.sh
-FTP_GEN		= $(SRCDIR)/requirements/bonus/ftp/tools/ftp-password-gen.sh
-SSL_GEN		= $(SRCDIR)/requirements/nginx/tools/ssl-cert-gen.sh
+SECRETS_GEN	= $(SRCDIR)/requirements/tools/secrets-gen.sh
 
 # Other Commands and Flags
 RM			= rm -rf
@@ -58,21 +56,21 @@ $(NAME): $(MARIADB_PASS) $(FTP_PASS) $(SSL_CERTS) $(SSH_KEY) $(SRC)
 	@chmod 755 $(NAME)
 	@sleep 5 && docker ps --all
 
-$(MARIADB_PASS) &: $(SECRETSDIR)
+$(MARIADB_PASS): $(SECRETSDIR)
 	@printf "$(GREEN)Generating MariaDB passwords...$(RESET)\n"
-	@./$(MARIADB_GEN)
+	@./$(SECRETS_GEN) pass $(SECRETSDIR)/$@
 
 $(FTP_PASS): $(SECRETSDIR)
 	@printf "$(GREEN)Generating FTP password...$(RESET)\n"
-	@./$(FTP_GEN)
+	@./$(SECRETS_GEN) pass $(SECRETSDIR)/$@
 
 $(SSL_CERTS) &: $(SECRETSDIR)
 	@printf "$(GREEN)Generating SSL certificates...$(RESET)\n"
-	@./$(SSL_GEN)
+	@./$(SECRETS_GEN) cert
 
 $(SSH_KEY): $(SECRETSDIR)
 	@printf "$(GREEN)Generating SSH key...$(RESET)\n"
-	@ssh-keygen -q -f secrets/ssh_key -N ""
+	@./$(SECRETS_GEN) ssh
 
 $(SECRETSDIR):
 	@mkdir --parents secrets/
