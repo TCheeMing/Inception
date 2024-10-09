@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/10/06 03:11:17 by cteoh            ###   ########.fr        #
+#    Updated: 2024/10/09 16:19:34 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,23 +15,27 @@ NAME = Inception
 
 # Source and Object Files
 SRCDIR			= srcs
-MARIADB			= mariadb.Dockerfile
-WORDPRESS		= wordpress-php.Dockerfile
+SECRETSDIR		= secrets
+ENV				= .env
+FTP				= ftp.Dockerfile sshd_config ftp-run.sh
+MARIADB			= mariadb.Dockerfile mariadb-run.sh
 NGINX			= nginx.Dockerfile nginx.conf
-SRC				= docker-compose.yml $(MARIADB) $(WORDPRESS) $(NGINX)
+REDIS			= redis.Dockerfile redis.conf
+WORDPRESS		= wordpress-php.Dockerfile wp-config.php wordpress-run.sh
+SRC				= docker-compose.yml .env $(FTP) $(MARIADB) $(NGINX) $(REDIS) \
+				  $(WORDPRESS)
 SSL_CERTS		= server.rsa.crt server.rsa.key
-MARIADB_PASS	= mariadb_root_password.txt mariadb_password.txt
+MARIADB_PASS	= mariadb_root_password mariadb_password
+FTP_PASS		= ftp_password
+SSH_KEY			= ssh_key
 vpath % $(shell find $(SRCDIR) -type d -print | tr "\n" ":"					  \
 		| awk '{print substr ($$1, 1, length($$1) - 1)}')
-vpath % secrets
-
-# Headers
+vpath % secrets/
 
 # Dependencies (Tools)
-MARIADB_GEN	= mariadb-password-gen.sh
-SSL_GEN		= ssl-cert-gen.sh
-
-# Libraries
+MARIADB_GEN	= $(SRCDIR)/requirements/mariadb/tools/mariadb-password-gen.sh
+FTP_GEN		= $(SRCDIR)/requirements/bonus/ftp/tools/ftp-password-gen.sh
+SSL_GEN		= $(SRCDIR)/requirements/nginx/tools/ssl-cert-gen.sh
 
 # Other Commands and Flags
 RM			= rm -rf
@@ -45,48 +49,59 @@ RESET	= \e[0m
 
 all: $(NAME)
 
-$(NAME): $(MARIADB_PASS) $(SSL_CERTS) $(SRC)
+$(NAME): $(MARIADB_PASS) $(FTP_PASS) $(SSL_CERTS) $(SSH_KEY) $(SRC)
 	@printf "$(GREEN)Generating and starting containers...$(RESET)\n"
-	@cd $(SRCDIR) && docker compose up --build -d
+	@cd $(SRCDIR) && docker compose up --build --detach
 	@echo "#!/bin/sh" > $(NAME)
 	@echo >> $(NAME)
-	@echo "cd $(SRCDIR) && docker compose logs -f" >> $(NAME)
+	@echo "cd $(SRCDIR) && docker compose logs --follow" >> $(NAME)
 	@chmod 755 $(NAME)
-	@sleep 5 && docker ps -a
+	@sleep 5 && docker ps --all
 
-$(MARIADB_PASS) &:
+$(MARIADB_PASS) &: $(SECRETSDIR)
 	@printf "$(GREEN)Generating MariaDB passwords...$(RESET)\n"
-	@mkdir -p secrets/
-	@./$(SRCDIR)/requirements/mariadb/tools/$(MARIADB_GEN)
+	@./$(MARIADB_GEN)
 
-$(SSL_CERTS) &:
+$(FTP_PASS): $(SECRETSDIR)
+	@printf "$(GREEN)Generating FTP password...$(RESET)\n"
+	@./$(FTP_GEN)
+
+$(SSL_CERTS) &: $(SECRETSDIR)
 	@printf "$(GREEN)Generating SSL certificates...$(RESET)\n"
-	@mkdir -p secrets/
-	@./$(SRCDIR)/requirements/nginx/tools/$(SSL_GEN)
+	@./$(SSL_GEN)
+
+$(SSH_KEY): $(SECRETSDIR)
+	@printf "$(GREEN)Generating SSH key...$(RESET)\n"
+	@ssh-keygen -q -f secrets/ssh_key -N ""
+
+$(SECRETSDIR):
+	@mkdir --parents secrets/
 
 up:
 	@printf "$(GREEN)Starting containers...$(RESET)\n"
-	@cd $(SRCDIR) && docker compose up -d
-	@sleep 5 && docker ps -a
+	@cd $(SRCDIR) && docker compose up --detach
+	@sleep 5 && docker ps --all
 
 stop:
 	@printf "$(GREEN)Stopping containers...$(RESET)\n"
 	@cd $(SRCDIR) && docker compose stop
-	@sleep 5 && docker ps -a
+	@sleep 5 && docker ps --all
 
 clean:
 	@printf "$(YELLOW)Stopping and removing all containers...$(RESET)\n"
 	@cd $(SRCDIR) && docker compose down
 
 fclean: clean
+	@printf "$(YELLOW)Removing SSH key...$(RESET)\n"
+	@$(RM) ./$(SRCDIR)/requirements/bonus/ftp/*.pub
 	@printf "$(YELLOW)Removing all secrets...$(RESET)\n"
-	@$(RM) secrets/*
+	@$(RM) secrets/
 	@printf "$(YELLOW)Removing all named volumes...$(RESET)\n"
 	@$(shell docker volume rm -f $$(docker volume ls -q) > /dev/null 2>&1)
 	@printf "$(YELLOW)Removing all images...$(RESET)\n"
 	@$(shell docker rmi -f $$(docker images -q) > /dev/null 2>&1)
 	@printf "$(YELLOW)Removing all anonymous volumes, unused networks, and unused build cache...$(RESET)\n"
-	@docker system prune --volumes -f
+	@docker system prune --volumes --force
 	@$(RM) $(NAME)
 
 re: fclean all

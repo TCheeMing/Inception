@@ -1,6 +1,25 @@
 name: Inception
 
 services:
+  ftp:
+    build:
+      context: ./requirements/bonus/ftp/
+      dockerfile: ftp.Dockerfile
+    depends_on:
+      - wordpress-php
+    env_file:
+      - .env
+    networks:
+      - infra
+    ports:
+      - 22
+    restart: on-failure
+    secrets:
+      - ftp_password
+      - ssh_key
+    volumes:
+      - ~/data/wordpress:/var/www/html:rw
+
   mariadb:
     build:
       context: ./requirements/mariadb/
@@ -27,8 +46,7 @@ services:
     networks:
       - infra
     ports:
-      - 127.0.0.1:32768:80
-      - 127.0.0.1:32769:443
+      - 443
     restart: on-failure
     secrets:
       - server.rsa.crt
@@ -67,14 +85,18 @@ networks:
     driver: bridge
 
 secrets:
+  ftp_password:
+    file: ../secrets/ftp_password
+  mariadb_password:
+    file: ../secrets/mariadb_password
+  mariadb_root_password:
+    file: ../secrets/mariadb_root_password
   server.rsa.crt:
     file: ../secrets/server.rsa.crt
   server.rsa.key:
     file: ../secrets/server.rsa.key
-  mariadb_root_password:
-    file: ../secrets/mariadb_root_password
-  mariadb_password:
-    file: ../secrets/mariadb_password
+  ssh_key:
+    file: ../secrets/ssh_key.pub
 
 volumes:
   realtime:
