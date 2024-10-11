@@ -17,7 +17,7 @@ if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
 	done
 	mariadb -e "RENAME USER '$MARIADB_USER'@'localhost' TO '$MARIADB_USER'@'%';"
 	mariadb -e "GRANT ALL PRIVILEGES ON *.* TO '$MARIADB_USER'@'%' IDENTIFIED BY '' WITH GRANT OPTION;"
-	mariadb -e "SET PASSWORD FOR '$MARIADB_USER'@'%' = PASSWORD(\"$MARIADB_PASSWORD\");"
+	mariadb -e "UPDATE mysql.global_priv SET priv=json_set(priv, '\$.plugin', 'mysql_native_password', '\$.authentication_string', PASSWORD('$MARIADB_PASSWORD')) WHERE User='$MARIADB_USER';"
 	mariadb -e "DELETE FROM mysql.global_priv WHERE User='';"
 	mariadb -e "DELETE FROM mysql.global_priv WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
 	mariadb -e "FLUSH PRIVILEGES;"

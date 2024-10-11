@@ -1,6 +1,16 @@
 name: Inception
 
 services:
+  adminer:
+    build:
+      context: ./requirements/bonus/adminer/
+      dockerfile: adminer.Dockerfile
+    depends_on:
+      - mariadb
+    networks:
+      - infra
+    restart: on-failure
+
   ftp:
     build:
       context: ./requirements/bonus/ftp/
@@ -18,7 +28,7 @@ services:
       - ftp_password
       - ssh_key
     volumes:
-      - ~/data/wordpress:/var/www/html:rw
+      - ~/data/wordpress/:/var/www/html/:rw
 
   mariadb:
     build:
@@ -33,13 +43,14 @@ services:
       - mariadb_root_password
       - mariadb_password
     volumes:
-      - ~/data/mariadb:/var/lib/mysql:rw
+      - ~/data/mariadb/:/var/lib/mysql/:rw
 
   nginx:
     build:
       context: requirements/nginx/
       dockerfile: nginx.Dockerfile
     depends_on:
+      - adminer
       - wordpress-php
     env_file:
       - .env
@@ -77,8 +88,8 @@ services:
     secrets:
       - mariadb_password
     volumes:
-      - ~/data/wordpress:/var/www/html:rw
-      - realtime:/usr/share/php83/fpm:ro
+      - ~/data/wordpress:/var/www/html/:rw
+      - realtime:/usr/share/php83/fpm/:ro
 
 networks:
   infra:

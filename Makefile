@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/10/09 16:49:06 by cteoh            ###   ########.fr        #
+#    Updated: 2024/10/10 16:12:42 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,7 @@ NAME = Inception
 # Source and Object Files
 SRCDIR			= srcs
 ENV				= .env
+ADMINER			= adminer.Dockerfile
 FTP				= ftp.Dockerfile sshd_config ftp-run.sh
 MARIADB			= mariadb.Dockerfile mariadb-run.sh
 NGINX			= nginx.Dockerfile nginx.conf
@@ -30,7 +31,7 @@ FTP_PASS		= ftp_password
 SSH_KEY			= ssh_key
 vpath % $(shell find $(SRCDIR) -type d -print | tr "\n" ":"					  \
 		| awk '{print substr ($$1, 1, length($$1) - 1)}')
-vpath % secrets/
+vpath % secrets
 
 # Dependencies (Tools)
 SECRETS_GEN	= $(SRCDIR)/requirements/tools/secrets-gen.sh
