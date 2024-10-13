@@ -7,6 +7,7 @@ services:
       dockerfile: adminer.Dockerfile
     depends_on:
       - mariadb
+      - rsyslog
     networks:
       - infra
     restart: on-failure
@@ -16,6 +17,7 @@ services:
       context: ./requirements/bonus/ftp/
       dockerfile: ftp.Dockerfile
     depends_on:
+      - rsyslog
       - wordpress-php
     env_file:
       - .env
@@ -28,12 +30,14 @@ services:
       - ftp_password
       - ssh_key
     volumes:
-      - ~/data/wordpress/:/var/www/html/:rw
+      - ~/data/wordpress/files/:/var/www/html/:rw
 
   mariadb:
     build:
       context: ./requirements/mariadb/
       dockerfile: mariadb.Dockerfile
+    depends_on:
+      - rsyslog
     env_file:
       - .env
     networks:
@@ -45,12 +49,25 @@ services:
     volumes:
       - ~/data/mariadb/:/var/lib/mysql/:rw
 
+  gitea:
+    build:
+      context: ./requirements/bonus/gitea
+      dockerfile: gitea.Dockerfile
+    depends_on:
+      - mariadb
+    networks:
+      - infra
+    restart: on-failure
+    volumes:
+      - ~/data/gitea/data/:/data:rw
+
   nginx:
     build:
       context: requirements/nginx/
       dockerfile: nginx.Dockerfile
     depends_on:
       - adminer
+      - rsyslog
       - wordpress-php
     env_file:
       - .env
@@ -64,11 +81,22 @@ services:
       - server.rsa.key
     volumes_from:
       - wordpress-php:ro
+      - gitea:ro
 
   redis:
     build:
       context: requirements/bonus/redis/
       dockerfile: redis.Dockerfile
+    depends_on:
+      - rsyslog
+    networks:
+      - infra
+    restart: on-failure
+  
+  rsyslog:
+    build:
+      context: requirements/bonus/rsyslog/
+      dockerfile: rsyslog.Dockerfile
     networks:
       - infra
     restart: on-failure
@@ -82,14 +110,15 @@ services:
     depends_on:
       - mariadb
       - redis
+      - rsyslog
     networks:
       - infra
     restart: on-failure
     secrets:
       - mariadb_password
     volumes:
-      - ~/data/wordpress:/var/www/html/:rw
-      - realtime:/usr/share/php83/fpm/:ro
+      - ~/data/wordpress/files/:/var/www/html/:rw
+      - ~/data/wordpress/realtime/:/usr/share/php83/fpm/:ro
 
 networks:
   infra:
@@ -108,6 +137,3 @@ secrets:
     file: ../secrets/server.rsa.key
   ssh_key:
     file: ../secrets/ssh_key.pub
-
-volumes:
-  realtime:

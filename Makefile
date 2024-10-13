@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/10/10 16:12:42 by cteoh            ###   ########.fr        #
+#    Updated: 2024/10/14 05:00:28 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,20 +18,22 @@ SRCDIR			= srcs
 ENV				= .env
 ADMINER			= adminer.Dockerfile
 FTP				= ftp.Dockerfile sshd_config ftp-run.sh
+REDIS			= redis.Dockerfile redis.conf
+RSYSLOG			= rsyslog.Dockerfile rsyslog.conf
+GITEA			= gitea.Dockerfile
+BONUS			= $(ADMINER) $(FTP) $(GITEA) $(REDIS) $(RSYSLOG)
 MARIADB			= mariadb.Dockerfile mariadb-run.sh
 NGINX			= nginx.Dockerfile nginx.conf
-REDIS			= redis.Dockerfile redis.conf
 WORDPRESS		= wordpress-php.Dockerfile wp-config.php wordpress-run.sh
-SRC				= docker-compose.yml .env $(FTP) $(MARIADB) $(NGINX) $(REDIS) \
-				  $(WORDPRESS)
+SRC				= docker-compose.yml .env $(MARIADB) $(NGINX) $(WORDPRESS)	  \
+				  $(BONUS)
 SECRETSDIR		= secrets
 SSL_CERTS		= server.rsa.crt server.rsa.key
 MARIADB_PASS	= mariadb_root_password mariadb_password
 FTP_PASS		= ftp_password
-SSH_KEY			= ssh_key
+SSH_KEY			= ssh_key ssh_key.pub
 vpath % $(shell find $(SRCDIR) -type d -print | tr "\n" ":"					  \
-		| awk '{print substr ($$1, 1, length($$1) - 1)}')
-vpath % secrets
+		| awk '{print substr ($$1, 1, length($$1) - 1)}'):$(SECRETSDIR)
 
 # Dependencies (Tools)
 SECRETS_GEN	= $(SRCDIR)/requirements/tools/secrets-gen.sh
@@ -48,7 +50,8 @@ RESET	= \e[0m
 
 all: $(NAME)
 
-$(NAME): $(MARIADB_PASS) $(FTP_PASS) $(SSL_CERTS) $(SSH_KEY) $(SRC)
+$(NAME): $(SECRETSDIR) $(MARIADB_PASS) $(FTP_PASS) $(SSL_CERTS) $(SSH_KEY)    \
+		 $(SRC)
 	@printf "$(GREEN)Generating and starting containers...$(RESET)\n"
 	@cd $(SRCDIR) && docker compose up --build --detach
 	@echo "#!/bin/sh" > $(NAME)
@@ -57,24 +60,24 @@ $(NAME): $(MARIADB_PASS) $(FTP_PASS) $(SSL_CERTS) $(SSH_KEY) $(SRC)
 	@chmod 755 $(NAME)
 	@sleep 5 && docker ps --all
 
-$(MARIADB_PASS): $(SECRETSDIR)
+$(MARIADB_PASS) &:
 	@printf "$(GREEN)Generating MariaDB passwords...$(RESET)\n"
-	@./$(SECRETS_GEN) pass $(SECRETSDIR)/$@
+	@./$(SECRETS_GEN) mariadb
 
-$(FTP_PASS): $(SECRETSDIR)
+$(FTP_PASS):
 	@printf "$(GREEN)Generating FTP password...$(RESET)\n"
-	@./$(SECRETS_GEN) pass $(SECRETSDIR)/$@
+	@./$(SECRETS_GEN) ftp
 
-$(SSL_CERTS) &: $(SECRETSDIR)
+$(SSL_CERTS) &:
 	@printf "$(GREEN)Generating SSL certificates...$(RESET)\n"
-	@./$(SECRETS_GEN) cert
+	@./$(SECRETS_GEN) cert 2> /dev/null
 
-$(SSH_KEY): $(SECRETSDIR)
+$(SSH_KEY) &:
 	@printf "$(GREEN)Generating SSH key...$(RESET)\n"
 	@./$(SECRETS_GEN) ssh
 
 $(SECRETSDIR):
-	@mkdir --parents secrets/
+	@mkdir --parents $(SECRETSDIR)
 
 up:
 	@printf "$(GREEN)Starting containers...$(RESET)\n"
@@ -91,10 +94,8 @@ clean:
 	@cd $(SRCDIR) && docker compose down
 
 fclean: clean
-	@printf "$(YELLOW)Removing SSH key...$(RESET)\n"
-	@$(RM) ./$(SRCDIR)/requirements/bonus/ftp/*.pub
 	@printf "$(YELLOW)Removing all secrets...$(RESET)\n"
-	@$(RM) secrets/
+	@$(RM) $(SECRETSDIR)
 	@printf "$(YELLOW)Removing all named volumes...$(RESET)\n"
 	@$(shell docker volume rm -f $$(docker volume ls -q) > /dev/null 2>&1)
 	@printf "$(YELLOW)Removing all images...$(RESET)\n"
