@@ -51,13 +51,15 @@ services:
       - infra
     restart: on-failure
     volumes:
-      - ~/data/gitea/data/:/data:rw
+      - ~/data/gitea/data/:/gitea/data/:rw
+      - ~/data/gitea/public/:/gitea/public/:rw
 
   nginx:
     build:
       context: requirements/nginx/
       dockerfile: nginx.Dockerfile
     depends_on:
+      - gitea
       - rsyslog
       - wordpress-php
     env_file:

@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/10/14 05:00:28 by cteoh            ###   ########.fr        #
+#    Updated: 2024/10/14 23:55:25 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -92,6 +92,7 @@ stop:
 clean:
 	@printf "$(YELLOW)Stopping and removing all containers...$(RESET)\n"
 	@cd $(SRCDIR) && docker compose down
+	@$(RM) $(NAME)
 
 fclean: clean
 	@printf "$(YELLOW)Removing all secrets...$(RESET)\n"
@@ -102,7 +103,6 @@ fclean: clean
 	@$(shell docker rmi -f $$(docker images -q) > /dev/null 2>&1)
 	@printf "$(YELLOW)Removing all anonymous volumes, unused networks, and unused build cache...$(RESET)\n"
 	@docker system prune --volumes --force
-	@$(RM) $(NAME)
 
 re: fclean all
 

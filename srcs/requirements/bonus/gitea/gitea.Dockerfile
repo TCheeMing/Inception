@@ -4,9 +4,10 @@ EXPOSE 2222 3000
 
 ENV TZ="Asia/Kuala_Lumpur"
 
-WORKDIR /data/
+WORKDIR /gitea/
 
 RUN apk add --no-cache git gitea tzdata su-exec && \
+	chown gitea:www-data /gitea/ && \
 	mv /etc/gitea/app.ini /etc/gitea/app.ini.default
 
 COPY ./tools/gitea-run.sh /root/

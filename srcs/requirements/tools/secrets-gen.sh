@@ -28,7 +28,7 @@ case "$1" in
 			-newkey rsa:4096 \
 			-x509 \
 			-sha256 \
-			-days 365 \
+			-days 3650 \
 			-nodes \
 			-out $SECRETS_DIR/server.rsa.crt \
 			-keyout $SECRETS_DIR/server.rsa.key \
