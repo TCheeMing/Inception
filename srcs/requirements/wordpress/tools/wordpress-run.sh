@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ -z "$(ls -A /var/www/html/ 2> /dev/null)" ]; then
-	MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
+	MARIADB_PASSWORD=$(base64 /run/secrets/mariadb_password)
 	mv /root/wp-config.php /root/test_page.php /var/www/html/
 	cd /var/www/html/
 	wget --no-verbose https://wordpress.org/wordpress-6.6.2.tar.gz

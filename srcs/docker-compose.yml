@@ -5,9 +5,6 @@ services:
     build:
       context: ./requirements/bonus/adminer/
       dockerfile: adminer.Dockerfile
-    depends_on:
-      - mariadb
-      - rsyslog
     networks:
       - infra
     restart: on-failure
@@ -17,7 +14,6 @@ services:
       context: ./requirements/bonus/ftp/
       dockerfile: ftp.Dockerfile
     depends_on:
-      - rsyslog
       - wordpress-php
     env_file:
       - .env
@@ -36,8 +32,6 @@ services:
     build:
       context: ./requirements/mariadb/
       dockerfile: mariadb.Dockerfile
-    depends_on:
-      - rsyslog
     env_file:
       - .env
     networks:
@@ -53,8 +47,6 @@ services:
     build:
       context: ./requirements/bonus/gitea
       dockerfile: gitea.Dockerfile
-    depends_on:
-      - mariadb
     networks:
       - infra
     restart: on-failure
@@ -66,7 +58,6 @@ services:
       context: requirements/nginx/
       dockerfile: nginx.Dockerfile
     depends_on:
-      - adminer
       - rsyslog
       - wordpress-php
     env_file:
@@ -87,8 +78,6 @@ services:
     build:
       context: requirements/bonus/redis/
       dockerfile: redis.Dockerfile
-    depends_on:
-      - rsyslog
     networks:
       - infra
     restart: on-failure
@@ -100,6 +89,8 @@ services:
     networks:
       - infra
     restart: on-failure
+    volumes:
+      - ~/data/rsyslog:/var/log/:rw
 
   wordpress-php:
     build:
@@ -107,10 +98,6 @@ services:
       dockerfile: wordpress-php.Dockerfile
     env_file:
       - .env
-    depends_on:
-      - mariadb
-      - redis
-      - rsyslog
     networks:
       - infra
     restart: on-failure
