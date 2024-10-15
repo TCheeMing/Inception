@@ -49,7 +49,12 @@ services:
       dockerfile: gitea.Dockerfile
     networks:
       - infra
+    ports:
+      - 22222:22222
     restart: on-failure
+    secrets:
+      - gitea-server.rsa.crt
+      - gitea-server.rsa.key
     volumes:
       - ~/data/gitea/data/:/gitea/data/:rw
       - ~/data/gitea/public/:/gitea/public/:rw
@@ -70,8 +75,8 @@ services:
       - 443
     restart: on-failure
     secrets:
-      - server.rsa.crt
-      - server.rsa.key
+      - nginx-server.rsa.crt
+      - nginx-server.rsa.key
     volumes_from:
       - wordpress-php:ro
       - gitea:ro
@@ -116,13 +121,17 @@ networks:
 secrets:
   ftp_password:
     file: ../secrets/ftp_password
+  gitea-server.rsa.crt:
+    file: ../secrets/gitea-server.rsa.crt
+  gitea-server.rsa.key:
+    file: ../secrets/gitea-server.rsa.key
   mariadb_password:
     file: ../secrets/mariadb_password
   mariadb_root_password:
     file: ../secrets/mariadb_root_password
-  server.rsa.crt:
-    file: ../secrets/server.rsa.crt
-  server.rsa.key:
-    file: ../secrets/server.rsa.key
+  nginx-server.rsa.crt:
+    file: ../secrets/nginx-server.rsa.crt
+  nginx-server.rsa.key:
+    file: ../secrets/nginx-server.rsa.key
   ssh_key:
     file: ../secrets/ssh_key.pub

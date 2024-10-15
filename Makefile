@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/10/14 23:55:25 by cteoh            ###   ########.fr        #
+#    Updated: 2024/10/15 11:24:08 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,8 @@ WORDPRESS		= wordpress-php.Dockerfile wp-config.php wordpress-run.sh
 SRC				= docker-compose.yml .env $(MARIADB) $(NGINX) $(WORDPRESS)	  \
 				  $(BONUS)
 SECRETSDIR		= secrets
-SSL_CERTS		= server.rsa.crt server.rsa.key
+NGINX_SSL_CERTS	= nginx-server.rsa.crt nginx-server.rsa.key
+GITEA_SSL_CERTS = gitea-server.rsa.crt gitea-server.rsa.key
 MARIADB_PASS	= mariadb_root_password mariadb_password
 FTP_PASS		= ftp_password
 SSH_KEY			= ssh_key ssh_key.pub
@@ -50,8 +51,8 @@ RESET	= \e[0m
 
 all: $(NAME)
 
-$(NAME): $(SECRETSDIR) $(MARIADB_PASS) $(FTP_PASS) $(SSL_CERTS) $(SSH_KEY)    \
-		 $(SRC)
+$(NAME): $(SECRETSDIR) $(MARIADB_PASS) $(FTP_PASS) $(NGINX_SSL_CERTS)		  \
+		 $(GITEA_SSL_CERTS) $(SSH_KEY) $(SRC)
 	@printf "$(GREEN)Generating and starting containers...$(RESET)\n"
 	@cd $(SRCDIR) && docker compose up --build --detach
 	@echo "#!/bin/sh" > $(NAME)
@@ -68,13 +69,18 @@ $(FTP_PASS):
 	@printf "$(GREEN)Generating FTP password...$(RESET)\n"
 	@./$(SECRETS_GEN) ftp
 
-$(SSL_CERTS) &:
-	@printf "$(GREEN)Generating SSL certificates...$(RESET)\n"
-	@./$(SECRETS_GEN) cert 2> /dev/null
+$(NGINX_SSL_CERTS) &:
+	@printf "$(GREEN)Generating NGINX SSL certificates...$(RESET)\n"
+	@./$(SECRETS_GEN) nginx 2> /dev/null
 
 $(SSH_KEY) &:
 	@printf "$(GREEN)Generating SSH key...$(RESET)\n"
 	@./$(SECRETS_GEN) ssh
+
+$(GITEA_SSL_CERTS) &:
+	@printf "$(GREEN)Generating Gitea SSL certificates...$(RESET)\n"
+	@./$(SECRETS_GEN) gitea 2> /dev/null
+	@chmod 604 $(SECRETSDIR)/gitea-server.rsa.key
 
 $(SECRETSDIR):
 	@mkdir --parents $(SECRETSDIR)

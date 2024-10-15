@@ -14,7 +14,7 @@ case "$1" in
 	"ftp")
 		openssl rand -base64 -out $SECRETS_DIR/ftp_password 20
 		;;
-	"cert")
+	"nginx")
 		# req:		OpenSSL certificate request and certificate generating utility
 		# -newkey:	Creates new certificate request and new private key (Default size of RSA key is 2048 bits)
 		# -x509:	Outputs a self signed certificate, instead of a certificate request
@@ -30,11 +30,31 @@ case "$1" in
 			-sha256 \
 			-days 3650 \
 			-nodes \
-			-out $SECRETS_DIR/server.rsa.crt \
-			-keyout $SECRETS_DIR/server.rsa.key \
+			-out $SECRETS_DIR/nginx-server.rsa.crt \
+			-keyout $SECRETS_DIR/nginx-server.rsa.key \
 			-subj "/C=/ST=/L=/O=/OU=/CN="
 		;;
 	"ssh")
 		ssh-keygen -q -f $SECRETS_DIR/ssh_key -N ""
+		;;
+	"gitea")
+		# req:		OpenSSL certificate request and certificate generating utility
+		# -newkey:	Creates new certificate request and new private key (Default size of RSA key is 2048 bits)
+		# -x509:	Outputs a self signed certificate, instead of a certificate request
+		# -sha256:	Uses 256-bit Secure Hash Algorithm
+		# -days:	Specifies number of days to certify the certificate for (used with -x509)
+		# -nodes:	If a private key is created it will not be encrypted (without a passphrase)
+		# -out:		Specifies output filename to write the newly created certificate to (Default is stdout)
+		# -keyout:	Gives the filename to write the newly created private key to
+		# -subj:	Replaces subject field of input request with specified data
+		openssl req \
+			-newkey rsa:4096 \
+			-x509 \
+			-sha256 \
+			-days 3650 \
+			-nodes \
+			-out $SECRETS_DIR/gitea-server.rsa.crt \
+			-keyout $SECRETS_DIR/gitea-server.rsa.key \
+			-subj "/C=/ST=/L=/O=/OU=/CN="
 		;;
 esac

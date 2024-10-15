@@ -1,6 +1,6 @@
 FROM alpine:3.20.3
 
-EXPOSE 2222 3000
+EXPOSE 3000 22222
 
 ENV TZ="Asia/Kuala_Lumpur"
 
