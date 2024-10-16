@@ -112,7 +112,7 @@ services:
       - mariadb_password
     volumes:
       - ~/data/wordpress/files/:/var/www/html/:rw
-      - ~/data/wordpress/realtime/:/usr/share/php83/fpm/:ro
+      - php:/usr/share/php83/fpm/:ro
 
 networks:
   infra:
@@ -135,3 +135,6 @@ secrets:
     file: ../secrets/nginx-server.rsa.key
   ssh_key:
     file: ../secrets/ssh_key.pub
+
+volumes:
+  php:
