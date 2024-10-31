@@ -103,12 +103,10 @@ clean:
 fclean: clean
 	@printf "$(YELLOW)Removing all secrets...$(RESET)\n"
 	@$(RM) $(SECRETSDIR)
-	@printf "$(YELLOW)Removing all named volumes...$(RESET)\n"
-	@$(shell docker volume rm -f $$(docker volume ls -q) > /dev/null 2>&1)
-	@printf "$(YELLOW)Removing all images...$(RESET)\n"
-	@$(shell docker rmi -f $$(docker images -q) > /dev/null 2>&1)
-	@printf "$(YELLOW)Removing all anonymous volumes, unused networks, and unused build cache...$(RESET)\n"
-	@docker system prune --volumes --force
+	@printf "$(YELLOW)Removing all unused volumes...$(RESET)\n"
+	@docker volume prune --all --force
+	@printf "$(YELLOW)Removing all unused networks, unused images and build cache...$(RESET)\n"
+	@docker system prune --all --force
 
 re: fclean all
 
