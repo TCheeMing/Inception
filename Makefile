@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/10/15 11:24:08 by cteoh            ###   ########.fr        #
+#    Updated: 2024/12/07 22:19:57 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ NAME = Inception
 SRCDIR			= srcs
 ENV				= .env
 ADMINER			= adminer.Dockerfile
-FTP				= ftp.Dockerfile sshd_config ftp-run.sh
+FTP				= ftp.Dockerfile vsftpd.conf ftp-run.sh
 REDIS			= redis.Dockerfile redis.conf
 RSYSLOG			= rsyslog.Dockerfile rsyslog.conf
 GITEA			= gitea.Dockerfile

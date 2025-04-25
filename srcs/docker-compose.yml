@@ -1,4 +1,4 @@
-name: Inception
+name: inception
 
 services:
   adminer:
@@ -20,11 +20,11 @@ services:
     networks:
       - infra
     ports:
-      - 22
+      - 21
+      - 30000-30005:30000-30005
     restart: on-failure
     secrets:
       - ftp_password
-      - ssh_key
     volumes:
       - ~/data/wordpress/files/:/var/www/html/:rw
 
