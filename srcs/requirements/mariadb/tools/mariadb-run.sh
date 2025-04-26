@@ -6,7 +6,7 @@ fi
 if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
 	MARIADB_ROOT_PASSWORD=$(base64 /run/secrets/mariadb_root_password)
 	MARIADB_PASSWORD=$(base64 /run/secrets/mariadb_password)
-	mariadb-install-db --datadir=/var/lib/mysql --user=$MARIADB_USER --skip-test-db
+	mariadb-install-db --user=$MARIADB_USER --skip-test-db
 	mariadbd-safe --user=$MARIADB_USER --no-watch
 	sleep 3
 	MARIDB_PID=$(pgrep mariadb)
