@@ -88,11 +88,16 @@ $(SECRETSDIR):
 up:
 	@printf "$(GREEN)Starting containers...$(RESET)\n"
 	@cd $(SRCDIR) && docker compose up --detach
+	@echo "#!/bin/sh" > $(NAME)
+	@echo >> $(NAME)
+	@echo "cd $(SRCDIR) && docker compose logs --follow" >> $(NAME)
+	@chmod 755 $(NAME)
 	@sleep 5 && docker ps --all
 
 stop:
 	@printf "$(GREEN)Stopping containers...$(RESET)\n"
 	@cd $(SRCDIR) && docker compose stop
+	@$(RM) $(NAME)
 	@sleep 5 && docker ps --all
 
 clean:
