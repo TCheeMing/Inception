@@ -16,15 +16,16 @@ NAME = Inception
 # Source and Object Files
 SRCDIR			= srcs
 ENV				= .env
+PHP			= php-fpm.conf www.conf
+MARIADB			= mariadb.Dockerfile mariadb-server.cnf mariadb-run.sh
+NGINX			= nginx.Dockerfile nginx.conf
+WORDPRESS		= wordpress-php.Dockerfile wordpress-run.sh
 ADMINER			= adminer.Dockerfile
 FTP				= ftp.Dockerfile vsftpd.conf ftp-run.sh
 REDIS			= redis.Dockerfile redis.conf
 RSYSLOG			= rsyslog.Dockerfile rsyslog.conf
-GITEA			= gitea.Dockerfile
+GITEA			= gitea.Dockerfile app.ini gitea-run.sh
 BONUS			= $(ADMINER) $(FTP) $(GITEA) $(REDIS) $(RSYSLOG)
-MARIADB			= mariadb.Dockerfile mariadb-run.sh
-NGINX			= nginx.Dockerfile nginx.conf
-WORDPRESS		= wordpress-php.Dockerfile wp-config.php wordpress-run.sh
 SRC				= docker-compose.yml .env $(MARIADB) $(NGINX) $(WORDPRESS)	  \
 				  $(BONUS)
 SECRETSDIR		= secrets
