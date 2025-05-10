@@ -7,8 +7,8 @@
 
 # First-time MariaDB setup
 if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
-	MARIADB_ROOT_PASSWORD=$(base64 /run/secrets/mariadb_root_password)
-	MARIADB_PASSWORD=$(base64 /run/secrets/mariadb_password)
+	MARIADB_ROOT_PASSWORD=$(cat /run/secrets/mariadb_root_password)
+	MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
 	mariadb-install-db --skip-test-db
 	mariadbd-safe --user=root --no-watch
 	sleep 3
@@ -25,9 +25,9 @@ if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
 	
 	# WordPress Database Preparation
 	# https://developer.wordpress.org/advanced-administration/before-install/creating-database/
-	mariadb -e "CREATE DATABASE IF NOT EXISTS $MARIADB_WP_NAME";
+	mariadb -e "CREATE DATABASE IF NOT EXISTS $MARIADB_WORDPRESS_NAME";
 	mariadb -e "CREATE USER IF NOT EXISTS '$MARIADB_USER'@'%' IDENTIFIED BY '$MARIADB_PASSWORD';"
-	mariadb -e "GRANT ALL PRIVILEGES ON $MARIADB_WP_NAME.* TO '$MARIADB_USER'@'%';"
+	mariadb -e "GRANT ALL PRIVILEGES ON $MARIADB_WORDPRESS_NAME.* TO '$MARIADB_USER'@'%';"
 	
 	mariadb -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;"
 
