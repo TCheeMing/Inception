@@ -31,6 +31,7 @@ SECRETSDIR		= secrets
 NGINX_SSL_CERTS	= nginx-server.rsa.crt nginx-server.rsa.key
 GITEA_SSL_CERTS = gitea-server.rsa.crt gitea-server.rsa.key
 MARIADB_PASS	= mariadb_root_password mariadb_password
+WORDPRESS_PASS	= wordpress_admin_password wordpress_user_one_password 
 FTP_PASS		= ftp_password
 SSH_KEY			= ssh_key ssh_key.pub
 vpath % $(shell find $(SRCDIR) -type d -print | tr "\n" ":"					  \
@@ -51,7 +52,7 @@ RESET	= \e[0m
 
 all: $(NAME)
 
-$(NAME): $(SECRETSDIR) $(MARIADB_PASS) $(FTP_PASS) $(NGINX_SSL_CERTS)		  \
+$(NAME): $(SECRETSDIR) $(MARIADB_PASS) $(WORDPRESS_PASS) $(FTP_PASS) $(NGINX_SSL_CERTS)		  \
 		 $(GITEA_SSL_CERTS) $(SSH_KEY) $(SRC)
 	@printf "$(GREEN)Generating and starting containers...$(RESET)\n"
 	@cd $(SRCDIR) && docker compose up --build --detach
@@ -64,6 +65,10 @@ $(NAME): $(SECRETSDIR) $(MARIADB_PASS) $(FTP_PASS) $(NGINX_SSL_CERTS)		  \
 $(MARIADB_PASS) &:
 	@printf "$(GREEN)Generating MariaDB passwords...$(RESET)\n"
 	@./$(SECRETS_GEN) mariadb
+
+$(WORDPRESS_PASS) &:
+	@printf "$(GREEN)Generating WordPress passwords...$(RESET)\n"
+	@./$(SECRETS_GEN) wordpress
 
 $(FTP_PASS):
 	@printf "$(GREEN)Generating FTP password...$(RESET)\n"

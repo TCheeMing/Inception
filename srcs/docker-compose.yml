@@ -28,7 +28,7 @@ services:
     secrets:
       - ftp_password
     volumes:
-      - ~/data/wordpress/files/:/var/www/html/:rw
+      - ~/data/wordpress/:/var/www/html/:rw
 
   mariadb:
     build:
@@ -99,7 +99,7 @@ services:
       - infra
     restart: on-failure
     volumes:
-      - ~/data/rsyslog:/var/log/:rw
+      - ~/data/rsyslog/:/var/log/:rw
 
   wordpress-php:
     build:
@@ -115,8 +115,10 @@ services:
     restart: on-failure
     secrets:
       - mariadb_password
+      - wordpress_admin_password
+      - wordpress_user_one_password
     volumes:
-      - ~/data/wordpress/files/:/var/www/html/:rw
+      - ~/data/wordpress/:/var/www/html/:rw
       - php:/usr/share/php83/fpm/:ro
 
 networks:
@@ -140,6 +142,10 @@ secrets:
     file: ../secrets/nginx-server.rsa.key
   ssh_key:
     file: ../secrets/ssh_key.pub
+  wordpress_admin_password:
+    file: ../secrets/wordpress_admin_password
+  wordpress_user_one_password:
+    file: ../secrets/wordpress_user_one_password
 
 volumes:
   php:
