@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2024/12/07 22:19:57 by cteoh            ###   ########.fr        #
+#    Updated: 2025/05/11 12:00:51 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ NAME = Inception
 # Source and Object Files
 SRCDIR			= srcs
 ENV				= .env
-PHP			= php-fpm.conf www.conf
+PHP				= php-fpm.conf www.conf
 MARIADB			= mariadb.Dockerfile mariadb-server.cnf mariadb-run.sh
 NGINX			= nginx.Dockerfile nginx.conf
 WORDPRESS		= wordpress-php.Dockerfile wordpress-run.sh
@@ -27,12 +27,12 @@ RSYSLOG			= rsyslog.Dockerfile rsyslog.conf
 GITEA			= gitea.Dockerfile app.ini gitea-run.sh
 BONUS			= $(ADMINER) $(FTP) $(GITEA) $(REDIS) $(RSYSLOG)
 SRC				= docker-compose.yml .env $(MARIADB) $(NGINX) $(WORDPRESS)	  \
-				  $(BONUS)
+				  $(BONUS) $(PHP)
 SECRETSDIR		= secrets
 NGINX_SSL_CERTS	= nginx-server.rsa.crt nginx-server.rsa.key
 GITEA_SSL_CERTS = gitea-server.rsa.crt gitea-server.rsa.key
 MARIADB_PASS	= mariadb_root_password mariadb_password
-WORDPRESS_PASS	= wordpress_admin_password wordpress_user_one_password 
+WORDPRESS_PASS	= wordpress_admin_password wordpress_user_one_password
 FTP_PASS		= ftp_password
 SSH_KEY			= ssh_key ssh_key.pub
 vpath % $(shell find $(SRCDIR) -type d -print | tr "\n" ":"					  \
