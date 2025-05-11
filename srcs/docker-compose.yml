@@ -23,7 +23,7 @@ services:
       - infra
     ports:
       - 21:21
-      - 30000-30005:30000-30005
+      - 50000-50005:50000-50005
     restart: on-failure
     secrets:
       - ftp_password
