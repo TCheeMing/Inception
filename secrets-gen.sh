@@ -13,7 +13,7 @@ case "$1" in
 		;;
 	"wordpress")
 		openssl rand -base64 -out $SECRETS_DIR/wordpress_admin_password 20
-		openssl rand -base64 -out $SECRETS_DIR/wordpress_user_one_password 20
+		openssl rand -base64 -out $SECRETS_DIR/wordpress_user_password 20
 		;;
 	"ftp")
 		openssl rand -base64 -out $SECRETS_DIR/ftp_password 20

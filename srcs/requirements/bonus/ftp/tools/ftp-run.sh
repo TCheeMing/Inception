@@ -5,7 +5,6 @@ if [ -z "$(getent passwd | grep $FTP_USER)" ]; then
 	adduser -D -h /var/www/html/ $FTP_USER
 	FTP_PASSWORD=$(cat /run/secrets/ftp_password)
 	echo "$FTP_USER:$FTP_PASSWORD" | chpasswd 2> /dev/null
-	chown root:root /var/www/html/
 fi
 
 # https://linux.die.net/man/8/pure-ftpd

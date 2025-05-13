@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2025/05/11 12:00:51 by cteoh            ###   ########.fr        #
+#    Updated: 2025/05/14 02:13:17 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,18 +28,31 @@ GITEA			= gitea.Dockerfile app.ini gitea-run.sh
 BONUS			= $(ADMINER) $(FTP) $(GITEA) $(REDIS) $(RSYSLOG)
 SRC				= docker-compose.yml .env $(MARIADB) $(NGINX) $(WORDPRESS)	  \
 				  $(BONUS) $(PHP)
-SECRETSDIR		= secrets
-NGINX_SSL_CERTS	= nginx-server.rsa.crt nginx-server.rsa.key
-GITEA_SSL_CERTS = gitea-server.rsa.crt gitea-server.rsa.key
-MARIADB_PASS	= mariadb_root_password mariadb_password
-WORDPRESS_PASS	= wordpress_admin_password wordpress_user_one_password
-FTP_PASS		= ftp_password
-SSH_KEY			= ssh_key ssh_key.pub
+
+DATADIR			= ~/data
+
+SECRETSDIR				= secrets
+NGINX_SECRETS			= $(NGINX_CERT) $(NGINX_KEY)
+NGINX_CERT				= nginx-server.rsa.crt
+NGINX_KEY				= nginx-server.rsa.key
+
+MARIADB_SECRETS			= $(MARIADB_ROOT_PASS) $(MARIADB_USER_PASS)
+MARIADB_ROOT_PASS		= mariadb_root_password
+MARIADB_USER_PASS		= mariadb_password
+
+WORDPRESS_SECRETS		= $(WORDPRESS_ADMIN_PASS) $(WORDPRESS_USER_PASS)
+WORDPRESS_ADMIN_PASS	= wordpress_admin_password
+WORDPRESS_USER_PASS		= wordpress_user_password
+
+GITEA_SECRETS			= $(GITEA_CERT) $(GITEA_KEY)
+GITEA_CERT				= gitea-server.rsa.crt
+GITEA_KEY				= gitea-server.rsa.key
+
+FTP_SECRET				= ftp_password
+SECRETS					= $(SECRETSDIR) $(NGINX_SECRETS) $(MARIADB_SECRETS)	  \
+						  $(WORDPRESS_SECRETS) $(GITEA_SECRETS) $(FTP_SECRET)
 vpath % $(shell find $(SRCDIR) -type d -print | tr "\n" ":"					  \
 		| awk '{print substr ($$1, 1, length($$1) - 1)}'):$(SECRETSDIR)
-
-# Dependencies (Tools)
-SECRETS_GEN	= $(SRCDIR)/requirements/tools/secrets-gen.sh
 
 # Other Commands and Flags
 RM			= rm -rf
@@ -53,9 +66,9 @@ RESET	= \e[0m
 
 all: $(NAME)
 
-$(NAME): $(SECRETSDIR) $(MARIADB_PASS) $(WORDPRESS_PASS) $(FTP_PASS) $(NGINX_SSL_CERTS)		  \
-		 $(GITEA_SSL_CERTS) $(SSH_KEY) $(SRC)
-	@printf "$(GREEN)Generating and starting containers...$(RESET)\n"
+$(NAME): $(DATADIR) $(SECRETS) $(SRC)
+	@printf "$(GREEN)Building and starting containers...$(RESET)\n"
+	@chmod -R 644 $(SECRETSDIR)/*
 	@cd $(SRCDIR) && docker compose up --build --detach
 	@echo "#!/bin/sh" > $(NAME)
 	@echo >> $(NAME)
@@ -63,36 +76,51 @@ $(NAME): $(SECRETSDIR) $(MARIADB_PASS) $(WORDPRESS_PASS) $(FTP_PASS) $(NGINX_SSL
 	@chmod 755 $(NAME)
 	@sleep 5 && docker ps --all
 
-$(MARIADB_PASS) &:
-	@printf "$(GREEN)Generating MariaDB passwords...$(RESET)\n"
-	@./$(SECRETS_GEN) mariadb
+$(NGINX_CERT):
+	@printf "$(RED)Please place your NGINX cert in file named '$(NGINX_CERT)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
+	@exit 1
 
-$(WORDPRESS_PASS) &:
-	@printf "$(GREEN)Generating WordPress passwords...$(RESET)\n"
-	@./$(SECRETS_GEN) wordpress
+$(NGINX_KEY):
+	@printf "$(RED)Please place your NGINX key in file named '$(NGINX_KEY)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
+	@exit 1
 
-$(FTP_PASS):
-	@printf "$(GREEN)Generating FTP password...$(RESET)\n"
-	@./$(SECRETS_GEN) ftp
+$(MARIADB_ROOT_PASS):
+	@printf "$(RED)Please place your MariaDB root password in file named '$(MARIADB_ROOT_PASS)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
+	@exit 1
 
-$(NGINX_SSL_CERTS) &:
-	@printf "$(GREEN)Generating NGINX SSL certificates...$(RESET)\n"
-	@./$(SECRETS_GEN) nginx 2> /dev/null
+$(MARIADB_USER_PASS):
+	@printf "$(RED)Please place your MariaDB user password in file named '$(MARIADB_USER_PASS)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
+	@exit 1
 
-$(SSH_KEY) &:
-	@printf "$(GREEN)Generating SSH key...$(RESET)\n"
-	@./$(SECRETS_GEN) ssh
+$(WORDPRESS_ADMIN_PASS):
+	@printf "$(RED)Please place your WordPress admin password in file '$(WORDPRESS_ADMIN_PASS)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
+	@exit 1
 
-$(GITEA_SSL_CERTS) &:
-	@printf "$(GREEN)Generating Gitea SSL certificates...$(RESET)\n"
-	@./$(SECRETS_GEN) gitea 2> /dev/null
-	@chmod 604 $(SECRETSDIR)/gitea-server.rsa.key
+$(WORDPRESS_USER_PASS):
+	@printf "$(RED)Please place your WordPress user password in file '$(WORDPRESS_USER_PASS)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
+	@exit 1
+
+$(FTP_SECRET):
+	@printf "$(RED)Please place your FTP user password in file named '$(FTP_SECRET)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
+	@exit 1
+
+$(GITEA_CERT):
+	@printf "$(RED)Please place your Gitea cert in file named '$(GITEA_CERT)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
+	@exit 1
+
+$(GITEA_KEY):
+	@printf "$(RED)Please place your Gitea key in file named '$(GITEA_KEY)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
+	@exit 1
 
 $(SECRETSDIR):
 	@mkdir --parents $(SECRETSDIR)
 
+$(DATADIR):
+	@mkdir --parents $(DATADIR)
+
 up:
 	@printf "$(GREEN)Starting containers...$(RESET)\n"
+	@chmod -R 644 $(SECRETSDIR)/*
 	@cd $(SRCDIR) && docker compose up --detach
 	@echo "#!/bin/sh" > $(NAME)
 	@echo >> $(NAME)
@@ -112,8 +140,6 @@ clean:
 	@$(RM) $(NAME)
 
 fclean: clean
-	@printf "$(YELLOW)Removing all secrets...$(RESET)\n"
-	@$(RM) $(SECRETSDIR)
 	@printf "$(YELLOW)Removing all unused volumes...$(RESET)\n"
 	@docker volume prune --all --force
 	@printf "$(YELLOW)Removing all unused networks, unused images and build cache...$(RESET)\n"

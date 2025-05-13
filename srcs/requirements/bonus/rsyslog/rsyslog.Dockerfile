@@ -10,5 +10,6 @@ RUN apk add --no-cache rsyslog tzdata && \
 	mv /etc/rsyslog.conf /etc/rsyslog.conf.default
 
 COPY ./configs/rsyslog.conf /etc/
+COPY ./tools/rsyslog-run.sh /root/
 
-CMD [ "rsyslogd", "-n" ]
+CMD [ "/root/rsyslog-run.sh" ]

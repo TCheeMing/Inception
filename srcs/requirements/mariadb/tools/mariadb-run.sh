@@ -1,10 +1,5 @@
 #!/bin/sh
 
-# First-time user setup
-# if [ -z "$(getent passwd | grep $MARIADB_USER)" ]; then
-#	adduser -D -G mysql -g mysql $MARIADB_USER
-# fi
-
 # First-time MariaDB setup
 if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
 	MARIADB_ROOT_PASSWORD=$(cat /run/secrets/mariadb_root_password)
@@ -40,7 +35,7 @@ if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
 	mariadb -e "FLUSH PRIVILEGES;"
 
 	kill -s 15 $MARIDB_PID
-	# wait $MARIADB_PID
 	sleep 3
+	chmod -R 777 /var/lib/mysql/
 fi
 exec mariadbd --user=root

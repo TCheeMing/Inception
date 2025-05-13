@@ -3,7 +3,7 @@
 if ! [ wp core is-installed 2> /dev/null ]; then
 	MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
 	WP_ADMIN_PASSWORD=$(cat /run/secrets/wordpress_admin_password)
-	WP_USER_ONE_PASSWORD=$(cat /run/secrets/wordpress_user_one_password)
+	WP_USER_PASSWORD=$(cat /run/secrets/wordpress_user_password)
 	mv /root/wordpress/* /var/www/html/
 	rm -rf /root/wordpress/
 
@@ -43,6 +43,7 @@ if ! [ wp core is-installed 2> /dev/null ]; then
 				--skip-email 2> /dev/null
 	done
 
-	wp user create $WORDPRESS_USER_ONE $WORDPRESS_USER_ONE_EMAIL --user_pass=$WP_USER_ONE_PASSWORD
+	wp user create $WORDPRESS_USER $WORDPRESS_USER_EMAIL --user_pass=$WP_USER_PASSWORD
+	chmod -R 777 /var/www/html/
 fi
 exec php-fpm83 --nodaemonize

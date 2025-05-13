@@ -8,6 +8,6 @@ WORKDIR /var/www/html/
 
 RUN apk add --no-cache pure-ftpd tzdata
 
-COPY ./tools/ftp-run.sh	/root/
+COPY ./tools/ftp-run.sh /root/
 
 CMD [ "/root/ftp-run.sh" ]
