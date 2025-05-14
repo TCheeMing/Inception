@@ -1,6 +1,7 @@
 #!/bin/sh
 
-if ! [ wp core is-installed 2> /dev/null ]; then
+wp core is-installed 2> /dev/null
+if [ $? -eq 1 ]; then
 	MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
 	WP_ADMIN_PASSWORD=$(cat /run/secrets/wordpress_admin_password)
 	WP_USER_PASSWORD=$(cat /run/secrets/wordpress_user_password)
@@ -45,5 +46,7 @@ if ! [ wp core is-installed 2> /dev/null ]; then
 
 	wp user create $WORDPRESS_USER $WORDPRESS_USER_EMAIL --user_pass=$WP_USER_PASSWORD
 	chmod -R 777 /var/www/html/
+	wp plugin install redis-cache --activate
+	wp redis enable
 fi
 exec php-fpm83 --nodaemonize
