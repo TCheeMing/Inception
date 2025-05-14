@@ -74,7 +74,7 @@ $(NAME): $(DATADIR) $(SECRETS) $(SRC)
 	@echo >> $(NAME)
 	@echo "cd $(SRCDIR) && docker compose logs --follow" >> $(NAME)
 	@chmod 755 $(NAME)
-	@sleep 5 && docker ps --all
+	@docker ps --all
 
 $(NGINX_CERT):
 	@printf "$(RED)Please place your NGINX cert in file named '$(NGINX_CERT)' in the directory '$(SECRETSDIR)'.$(RESET)\n"
@@ -126,13 +126,13 @@ up:
 	@echo >> $(NAME)
 	@echo "cd $(SRCDIR) && docker compose logs --follow" >> $(NAME)
 	@chmod 755 $(NAME)
-	@sleep 5 && docker ps --all
+	@docker ps --all
 
 stop:
 	@printf "$(GREEN)Stopping containers...$(RESET)\n"
 	@cd $(SRCDIR) && docker compose stop
 	@$(RM) $(NAME)
-	@sleep 5 && docker ps --all
+	@docker ps --all
 
 clean:
 	@printf "$(YELLOW)Stopping and removing all containers...$(RESET)\n"
