@@ -1,0 +1,166 @@
+name: inception
+
+services:
+  adminer:
+    build:
+      context: ./bonus/adminer/
+      dockerfile: adminer.Dockerfile
+    depends_on:
+      - mariadb
+    networks:
+      - infra
+    restart: on-failure
+
+  ftp:
+    build:
+      context: ./bonus/ftp/
+      dockerfile: ftp.Dockerfile
+    depends_on:
+      - wordpress-php
+    env_file:
+      - .env
+    networks:
+      - infra
+    ports:
+      - 21:21
+      - 50000-50005:50000-50005
+    restart: on-failure
+    secrets:
+      - ftp_password
+    volumes:
+      - type: bind
+        source: ~/data/wordpress/
+        target: /var/www/html/
+
+  mariadb:
+    build:
+      context: ./requirements/mariadb/
+      dockerfile: mariadb.Dockerfile
+    env_file:
+      - .env
+    networks:
+      - infra
+    restart: on-failure
+    secrets:
+      - mariadb_root_password
+      - mariadb_password
+    volumes:
+      - type: bind
+        source: ~/data/mariadb/
+        target: /var/lib/mysql/
+
+  gitea:
+    build:
+      context: ./bonus/gitea
+      dockerfile: gitea.Dockerfile
+    networks:
+      - infra
+    ports:
+      - 22222:22222
+    restart: on-failure
+    secrets:
+      - gitea-server.rsa.crt
+      - gitea-server.rsa.key
+    volumes:
+      - type: bind
+        source: ~/data/gitea/
+        target: /gitea/
+      - type: bind
+        source: ~/data/gitea/
+        target: /gitea/
+
+  nginx:
+    build:
+      context: ./requirements/nginx/
+      dockerfile: nginx.Dockerfile
+    depends_on:
+      - gitea
+      - rsyslog
+      - wordpress-php
+    env_file:
+      - .env
+    networks:
+      - infra
+    ports:
+      - 443:443
+    restart: on-failure
+    secrets:
+      - nginx-server.rsa.crt
+      - nginx-server.rsa.key
+    volumes_from:
+      - wordpress-php:ro
+      - gitea:ro
+
+  redis:
+    build:
+      context: ./bonus/redis/
+      dockerfile: redis.Dockerfile
+    networks:
+      - infra
+    restart: on-failure
+
+  rsyslog:
+    build:
+      context: ./bonus/rsyslog/
+      dockerfile: rsyslog.Dockerfile
+    networks:
+      - infra
+    restart: on-failure
+    volumes:
+      - type: bind
+        source: ~/data/rsyslog/
+        target: /var/log/
+
+  wordpress-php:
+    build:
+      context: ./requirements/wordpress/
+      dockerfile: wordpress-php.Dockerfile
+    depends_on:
+      - mariadb
+      - redis
+    env_file:
+      - .env
+    networks:
+      - infra
+    restart: on-failure
+    secrets:
+      - mariadb_password
+      - wordpress_admin_password
+      - wordpress_user_password
+    volumes:
+      - type: bind
+        source: ~/data/wordpress/
+        target: /var/www/html/
+      - type: volume
+        source: php
+        target: /usr/share/php83/fpm/
+        read_only: true
+
+networks:
+  infra:
+    driver: bridge
+
+secrets:
+  ftp_password:
+    file: ../secrets/ftp_password
+  gitea-server.rsa.crt:
+    file: ../secrets/gitea-server.rsa.crt
+  gitea-server.rsa.key:
+    file: ../secrets/gitea-server.rsa.key
+  mariadb_password:
+    file: ../secrets/mariadb_password
+  mariadb_root_password:
+    file: ../secrets/mariadb_root_password
+  nginx-server.rsa.crt:
+    file: ../secrets/nginx-server.rsa.crt
+  nginx-server.rsa.key:
+    file: ../secrets/nginx-server.rsa.key
+  ssh_key:
+    file: ../secrets/ssh_key.pub
+  wordpress_admin_password:
+    file: ../secrets/wordpress_admin_password
+  wordpress_user_password:
+    file: ../secrets/wordpress_user_password
+
+volumes:
+  php:
