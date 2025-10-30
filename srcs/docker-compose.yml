@@ -3,7 +3,7 @@ name: inception
 services:
   adminer:
     build:
-      context: ./requirements/bonus/adminer/
+      context: ./bonus/adminer/
       dockerfile: adminer.Dockerfile
     depends_on:
       - mariadb
@@ -13,7 +13,7 @@ services:
 
   ftp:
     build:
-      context: ./requirements/bonus/ftp/
+      context: ./bonus/ftp/
       dockerfile: ftp.Dockerfile
     depends_on:
       - wordpress-php
@@ -51,7 +51,7 @@ services:
 
   gitea:
     build:
-      context: ./requirements/bonus/gitea
+      context: ./bonus/gitea
       dockerfile: gitea.Dockerfile
     networks:
       - infra
@@ -71,7 +71,7 @@ services:
 
   nginx:
     build:
-      context: requirements/nginx/
+      context: ./requirements/nginx/
       dockerfile: nginx.Dockerfile
     depends_on:
       - gitea
@@ -93,7 +93,7 @@ services:
 
   redis:
     build:
-      context: requirements/bonus/redis/
+      context: ./bonus/redis/
       dockerfile: redis.Dockerfile
     networks:
       - infra
@@ -101,7 +101,7 @@ services:
 
   rsyslog:
     build:
-      context: requirements/bonus/rsyslog/
+      context: ./bonus/rsyslog/
       dockerfile: rsyslog.Dockerfile
     networks:
       - infra
@@ -113,7 +113,7 @@ services:
 
   wordpress-php:
     build:
-      context: requirements/wordpress/
+      context: ./requirements/wordpress/
       dockerfile: wordpress-php.Dockerfile
     depends_on:
       - mariadb
