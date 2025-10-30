@@ -7,12 +7,13 @@ ENV TZ="Asia/Kuala_Lumpur"
 WORKDIR /var/www/html/
 
 RUN apk add --no-cache make curl php83 php83-fpm php83-tokenizer php83-session php83-mysqli tzdata && \
-	curl --remote-name https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1.zip --location && \
-	unzip adminer-4.8.1.zip && \
-	mv adminer-4.8.1/* . && \
-	rm -rf adminer-4.8.1/ *zip && \
+	curl --remote-name https://github.com/vrana/adminer/releases/download/v5.4.1/adminer-5.4.1.zip --location && \
+	unzip adminer-5.4.1.zip && \
+	mv adminer-5.4.1/* . && \
+	rm -rf adminer-5.4.1/ *zip && \
 	make && \
-	sed -i 's|\$Re=\$_SESSION\["messages"\]\[\$Mi\];|\$Session=!isset(\$_SESSION\["messages"\]\[\$Mi\])?0:\$_SESSION\["messages"\]\[\$Mi\];\$Re=\$Session;|g' adminer-4.8.1.php && \
+	sed -i 's|\$Re=\$_SESSION\["messages"\]\[\$Mi\];|\$Session=!isset(\$_SESSION\["messages"\]\[\$Mi\])?0:\$_SESSION\["messages"\]\[\$Mi\];\$Re=\$Session;|g' adminer-5.4.1.php && \
+	mv adminer-5.4.1.php adminer.php && \
 	cp /etc/php83/php-fpm.conf /etc/php83/php-fpm.conf.default && \
 	cp /etc/php83/php-fpm.d/www.conf /etc/php83/php-fpm.d/www.conf.default
 
