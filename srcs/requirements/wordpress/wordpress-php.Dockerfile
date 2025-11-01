@@ -15,6 +15,7 @@ RUN apk add --no-cache php83 php83-fpm php83-mysqli php83-phar php83-iconv php83
     php -d memory_limit=512M /usr/local/bin/wp core download --path=/root/wordpress/
 
 COPY ./tools/wordpress-run.sh ./tools/test_page.php /root/
+COPY ./resume /root/resume
 COPY ./configs/php-fpm.conf /etc/php83/
 COPY ./configs/www.conf /etc/php83/php-fpm.d/www.conf
 

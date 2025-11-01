@@ -1,0 +1,97 @@
+html {
+	box-sizing: border-box;
+	padding: 0px;
+	margin: 0px;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+#root {
+    padding: 1rem;
+}
+
+.title {
+    text-align: center;
+    margin: 0.25rem 0px;
+}
+
+.information {
+    display: flex;
+    justify-content: safe center;
+    flex-wrap: wrap;
+}
+
+.information-item {
+    display: flex;
+    align-items: safe center;
+    gap: 0.5rem;
+    padding: 0px 0.5rem;
+    border-right: 1.5px solid black;
+}
+
+.information-item svg {
+    fill: black;
+}
+
+.information-item img {
+    height: 24px;
+}
+
+.information > .information-item:last-of-type {
+    border-right: none;
+}
+
+section {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    margin-top: 0px;
+    margin-bottom: 0.5rem;
+}
+
+.introduction {
+    text-align: justify;
+}
+
+.horizontal-list {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.experience,
+.education {
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.experience-title,
+.education-title {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+}
+
+.experience-description,
+.project-description {
+    margin: 0px;
+}
+
+.experience-description li,
+.project-description li {
+    text-align: justify;
+}
+
+.projects {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

@@ -5,7 +5,7 @@ if [ $? -eq 1 ]; then
 	MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
 	WP_ADMIN_PASSWORD=$(cat /run/secrets/wordpress_admin_password)
 	WP_USER_PASSWORD=$(cat /run/secrets/wordpress_user_password)
-	mv /root/wordpress/* /var/www/html/
+	mv /root/wordpress/* /root/resume/* /var/www/html/
 	rm -rf /root/wordpress/
 
 	# Creates wp_config.php for installation and populates the WordPress database in MariaDB with necessary tables.
@@ -19,7 +19,7 @@ if [ $? -eq 1 ]; then
 				 --dbuser=$MARIADB_USER	\
 				 --dbpass=$MARIADB_PASSWORD \
 				 --dbhost=mariadb:3306 2> /dev/null
-	done 
+	done
 
 	# Sets necessary WordPress constants (especially for Redis connection).
 	wp config set WP_DEBUG true --raw
@@ -35,7 +35,7 @@ if [ $? -eq 1 ]; then
 			--admin_email=$WORDPRESS_ADMIN_EMAIL \
 			--skip-email 2> /dev/null
 	while [ $? -eq 1 ]
-	do	
+	do
 		wp core install --url=$DOMAIN_NAME \
 				--title=$WORDPRESS_TITLE \
 				--admin_user=$WORDPRESS_ADMIN \
