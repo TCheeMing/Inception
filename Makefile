@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2025/05/14 02:13:17 by cteoh            ###   ########.fr        #
+#    Updated: 2025/11/12 02:31:41 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -69,7 +69,7 @@ all: $(NAME)
 $(NAME): $(DATADIR) $(SECRETS) $(SRC)
 	@printf "$(GREEN)Building and starting containers...$(RESET)\n"
 	@chmod -R 644 $(SECRETSDIR)/*
-	@cd $(SRCDIR) && docker compose up --build --detach
+	@cd $(SRCDIR) && docker compose up --detach
 	@echo "#!/bin/sh" > $(NAME)
 	@echo >> $(NAME)
 	@echo "cd $(SRCDIR) && docker compose logs --follow" >> $(NAME)
@@ -121,7 +121,7 @@ $(DATADIR):
 up:
 	@printf "$(GREEN)Starting containers...$(RESET)\n"
 	@chmod -R 644 $(SECRETSDIR)/*
-	@cd $(SRCDIR) && docker compose up --detach
+	@cd $(SRCDIR) && docker compose up --build --detach
 	@echo "#!/bin/sh" > $(NAME)
 	@echo >> $(NAME)
 	@echo "cd $(SRCDIR) && docker compose logs --follow" >> $(NAME)
