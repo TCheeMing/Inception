@@ -1,5 +1,14 @@
 #!/bin/sh
 
+while true
+do
+	curl --fail mariadb:3306 &> /dev/null
+	if [ $? -eq 1 ]; then
+		echo WordPress-MariaDB connection successful.
+		break
+	fi
+done
+
 wp core is-installed 2> /dev/null
 if [ $? -eq 1 ]; then
 	MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
