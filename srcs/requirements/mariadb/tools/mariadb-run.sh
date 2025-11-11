@@ -6,7 +6,12 @@ if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
 	MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
 	mariadb-install-db --skip-test-db
 	mariadbd-safe --user=root --no-watch
-	sleep 3
+	while true
+	do
+		if netstat -lxp 2> /dev/null | grep mariadbd &> /dev/null; then
+			break
+		fi
+	done
 	MARIDB_PID=$(pgrep /usr/bin/mariadbd)
 
 	# Secure installation to improve database security.
@@ -35,7 +40,12 @@ if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
 	mariadb -e "FLUSH PRIVILEGES;"
 
 	kill -s 15 $MARIDB_PID
-	sleep 3
+	while true
+	do
+		if ! netstat -lxp 2> /dev/null | grep mariadbd &> /dev/null; then
+			break
+		fi
+	done
 	chmod -R 777 /var/lib/mysql/
 fi
 exec mariadbd --user=root
