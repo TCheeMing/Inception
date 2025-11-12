@@ -133,7 +133,7 @@ services:
         target: /var/www/html/
       - type: volume
         source: php
-        target: /usr/share/php83/fpm/
+        target: /usr/share/php84/fpm/
         read_only: true
 
 networks:
