@@ -67,7 +67,7 @@ RESET	= \e[0m
 all: $(NAME)
 
 $(NAME): $(DATADIR) $(SECRETS) $(SRC)
-	@printf "$(GREEN)Building and starting containers...$(RESET)\n"
+	@printf "$(GREEN)Starting containers...$(RESET)\n"
 	@chmod -R 644 $(SECRETSDIR)/*
 	@cd $(SRCDIR) && docker compose up --detach
 	@echo "#!/bin/sh" > $(NAME)
@@ -119,7 +119,7 @@ $(DATADIR):
 	@mkdir --parents $(DATADIR)
 
 up:
-	@printf "$(GREEN)Starting containers...$(RESET)\n"
+	@printf "$(GREEN)Building and starting containers...$(RESET)\n"
 	@chmod -R 644 $(SECRETSDIR)/*
 	@cd $(SRCDIR) && docker compose up --build --detach
 	@echo "#!/bin/sh" > $(NAME)
