@@ -6,9 +6,10 @@ ENV TZ="Asia/Kuala_Lumpur"
 
 WORKDIR /var/www/html/
 
-RUN apk add --no-cache php83 php83-fpm php83-mysqli php83-phar php83-iconv php83-tokenizer curl tzdata && \
-    cp /etc/php83/php-fpm.conf /etc/php83/php-fpm.conf.default && \
-    cp /etc/php83/php-fpm.d/www.conf /etc/php83/php-fpm.d/www.conf.default && \
+RUN apk add --no-cache php84 php84-fpm php84-mysqli php84-phar php84-iconv php84-tokenizer curl tzdata && \
+    ln -s /usr/bin/php84 /usr/bin/php && \
+    cp /etc/php84/php-fpm.conf /etc/php84/php-fpm.conf.default && \
+    cp /etc/php84/php-fpm.d/www.conf /etc/php84/php-fpm.d/www.conf.default && \
     curl --remote-name https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp && \
@@ -16,7 +17,7 @@ RUN apk add --no-cache php83 php83-fpm php83-mysqli php83-phar php83-iconv php83
 
 COPY ./tools/wordpress-run.sh ./tools/test_page.php /root/
 COPY ./resume /root/resume
-COPY ./configs/php-fpm.conf /etc/php83/
-COPY ./configs/www.conf /etc/php83/php-fpm.d/www.conf
+COPY ./configs/php-fpm.conf /etc/php84/
+COPY ./configs/www.conf /etc/php84/php-fpm.d/www.conf
 
 CMD [ "/root/wordpress-run.sh" ]

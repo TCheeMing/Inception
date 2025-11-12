@@ -58,4 +58,4 @@ if [ $? -eq 1 ] && [ -z "$(ls -A /var/www/html/ 2> /dev/null)" ]; then
 	wp plugin install redis-cache --activate
 	wp redis enable
 fi
-exec php-fpm83 --nodaemonize
+exec php-fpm84 --nodaemonize
