@@ -10,12 +10,12 @@ do
 done
 
 wp core is-installed 2> /dev/null
-if [ $? -eq 1 ]; then
+if [ $? -eq 1 ] && [ -z "$(ls -A /var/www/html/ 2> /dev/null)" ]; then
 	MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
 	WP_ADMIN_PASSWORD=$(cat /run/secrets/wordpress_admin_password)
 	WP_USER_PASSWORD=$(cat /run/secrets/wordpress_user_password)
 	mv /root/wordpress/* /root/resume/* /var/www/html/
-	rm -rf /root/wordpress/
+	rm -rf /root/wordpress/ /root/resume/
 
 	# Creates wp_config.php for installation and populates the WordPress database in MariaDB with necessary tables.
 	wp config create --dbname=$MARIADB_WORDPRESS_NAME \
