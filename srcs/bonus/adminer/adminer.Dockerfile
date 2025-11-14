@@ -13,7 +13,6 @@ RUN apk add --no-cache make curl php84 php84-fpm php84-tokenizer php84-session p
 	mv adminer-5.4.1/* . && \
 	rm -rf adminer-5.4.1/ *zip && \
 	make && \
-	sed -i 's|\$Re=\$_SESSION\["messages"\]\[\$Mi\];|\$Session=!isset(\$_SESSION\["messages"\]\[\$Mi\])?0:\$_SESSION\["messages"\]\[\$Mi\];\$Re=\$Session;|g' adminer-5.4.1.php && \
 	mv adminer-5.4.1.php adminer.php && \
 	cp /etc/php84/php-fpm.conf /etc/php84/php-fpm.conf.default && \
 	cp /etc/php84/php-fpm.d/www.conf /etc/php84/php-fpm.d/www.conf.default

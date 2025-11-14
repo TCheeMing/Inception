@@ -11,4 +11,4 @@ RUN apk add --no-cache nginx tzdata && \
 
 COPY ./configs/nginx.conf /etc/nginx/
 
-CMD [ "nginx", "-g", "daemon off;" ]
+CMD [ "nginx" ]
