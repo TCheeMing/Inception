@@ -14,4 +14,5 @@ fi
 # -j: Creates user home directory if it somehow does not exist. 
 # -p: Uses the specified port range for passive mode.
 # -R: Disallow use of chmod.
-exec pure-ftpd -A -d -E -j -p 50000:50005 -R 
+# -P: Force specified IP address or host name in reply to a PASV/EPSV command.
+exec pure-ftpd -A -d -E -j -p 50000:50005 -R -P 127.0.0.1
