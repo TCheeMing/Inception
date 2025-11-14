@@ -22,16 +22,16 @@ if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
 	# mariadb -e "DELETE FROM mysql.global_priv WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
 	# mariadb -e "DROP DATABASE IF EXISTS test;"
 	# mariadb -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'"
-	
+
 	# WordPress Database Preparation
 	# https://developer.wordpress.org/advanced-administration/before-install/creating-database/
-	# Creates a user with access rights to an empty database for WordPress. 
+	# Creates a user with access rights to an empty database for WordPress.
 	mariadb -e "CREATE DATABASE IF NOT EXISTS $MARIADB_WORDPRESS_NAME";
 	mariadb -e "CREATE USER IF NOT EXISTS '$MARIADB_USER'@'%' IDENTIFIED BY '$MARIADB_PASSWORD';"
 	mariadb -e "GRANT ALL PRIVILEGES ON $MARIADB_WORDPRESS_NAME.* TO '$MARIADB_USER'@'%';"
-	
+
 	# Gitea Database Preparation
-	# https://docs.gitea.com/installation/database-prep 
+	# https://docs.gitea.com/installation/database-prep
 	mariadb -e "CREATE USER 'gitea'@'%' IDENTIFIED BY 'gitea';"
 	mariadb -e "CREATE DATABASE giteadb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_bin';"
 	mariadb -e "GRANT ALL PRIVILEGES ON giteadb.* TO 'gitea';"
