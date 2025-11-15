@@ -28,8 +28,8 @@ services:
     secrets:
       - ftp_password
     volumes:
-      - type: bind
-        source: ~/data/wordpress/
+      - type: volume
+        source: wordpress-data
         target: /var/www/html/
 
   mariadb:
@@ -45,8 +45,8 @@ services:
       - mariadb_root_password
       - mariadb_password
     volumes:
-      - type: bind
-        source: ~/data/mariadb/
+      - type: volume
+        source: mariadb-data
         target: /var/lib/mysql/
 
   gitea:
@@ -62,11 +62,8 @@ services:
       - gitea-server.rsa.crt
       - gitea-server.rsa.key
     volumes:
-      - type: bind
-        source: ~/data/gitea/
-        target: /gitea/
-      - type: bind
-        source: ~/data/gitea/
+      - type: volume
+        source: gitea-data
         target: /gitea/
 
   nginx:
@@ -107,8 +104,8 @@ services:
       - infra
     restart: on-failure
     volumes:
-      - type: bind
-        source: ~/data/rsyslog/
+      - type: volume
+        source: rsyslog-data
         target: /var/log/
 
   wordpress-php:
@@ -128,8 +125,8 @@ services:
       - wordpress_admin_password
       - wordpress_user_password
     volumes:
-      - type: bind
-        source: ~/data/wordpress/
+      - type: volume
+        source: wordpress-data
         target: /var/www/html/
       - type: volume
         source: php
@@ -163,4 +160,24 @@ secrets:
     file: ../secrets/wordpress_user_password
 
 volumes:
+  wordpress-data:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/cteoh/data/wordpress"
+  mariadb-data:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/cteoh/data/mariadb"
+  gitea-data:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/cteoh/data/gitea"
+  rsyslog-data:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/cteoh/data/rsyslog"
   php:
