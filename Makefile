@@ -6,7 +6,7 @@
 #    By: cteoh <cteoh@student.42kl.edu.my>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 14:55:26 by cteoh             #+#    #+#              #
-#    Updated: 2025/11/12 02:31:41 by cteoh            ###   ########.fr        #
+#    Updated: 2025/11/18 23:41:37 by cteoh            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,7 @@ BONUS			= $(ADMINER) $(FTP) $(GITEA) $(REDIS) $(RSYSLOG)
 SRC				= docker-compose.yml .env $(MARIADB) $(NGINX) $(WORDPRESS)	  \
 				  $(BONUS) $(PHP)
 
-DATADIR			= ~/data
+DATADIR			= ~/data ~/data/wordpress ~/data/mariadb ~/data/gitea ~/data/rsyslog
 
 SECRETSDIR				= secrets
 NGINX_SECRETS			= $(NGINX_CERT) $(NGINX_KEY)
