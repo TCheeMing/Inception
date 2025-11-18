@@ -6,7 +6,7 @@ ENV TZ="Asia/Kuala_Lumpur"
 
 WORKDIR /gitea/
 
-RUN apk add --no-cache git gitea tzdata su-exec && \
+RUN apk add --no-cache git gitea tzdata su-exec sed && \
 	chown gitea:www-data /gitea/ && \
 	mv /etc/gitea/app.ini /etc/gitea/app.ini.default
 
