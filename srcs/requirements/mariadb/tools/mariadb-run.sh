@@ -47,5 +47,7 @@ if [ -z "$(ls -A /var/lib/mysql/ 2> /dev/null)" ]; then
 		fi
 	done
 	chmod -R 777 /var/lib/mysql/
+else
+	mkdir -p /run/mysqld/
 fi
 exec mariadbd --user=root
